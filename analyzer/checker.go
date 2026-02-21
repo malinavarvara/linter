@@ -1,7 +1,6 @@
 package analyzer
 
 import (
-	"fmt"
 	"go/ast"
 	"go/constant"
 	"go/token"
@@ -15,7 +14,7 @@ import (
 
 func run(pass *analysis.Pass) (any, error) {
 	for _, file := range pass.Files {
-		fmt.Printf("Файл: %s\n", pass.Fset.Position(file.Pos()).Filename)
+		// fmt.Printf("Файл: %s\n", pass.Fset.Position(file.Pos()).Filename)
 		ast.Inspect(file, func(n ast.Node) bool {
 			node, ok := n.(*ast.CallExpr)
 			// Проверяем, что это вызов функции и что она является функцией логирования из slog или zap

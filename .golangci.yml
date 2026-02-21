@@ -1,0 +1,13 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - linter
+  settings:
+    custom:
+      linter:
+        path: ./bin/linter.exe
+        description: "Линтер для проверки логов"
