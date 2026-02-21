@@ -53,49 +53,50 @@ func main() {
 	slog.Info(startMsg)
 
 	// ----- НЕПРАВИЛЬНЫЕ: первая буква заглавная -----
-	slog.Info("Starting server")      // должно ругаться: lowercase Latin letter
-	slog.Warn("Disk space low")       // должно ругаться
-	logger.Error("Failed to connect") // должно ругаться
-	zapLogger.Info("All systems go")  // должно ругаться
+	slog.Info("Starting server")      // want "lowercase"
+	slog.Warn("Disk space low")       // want "lowercase"
+	logger.Error("Failed to connect") // want "lowercase"
+	zapLogger.Info("All systems go")  // want "lowercase"
 
 	// ----- НЕПРАВИЛЬНЫЕ: нелатинские символы (кириллица, эмодзи) -----
-	slog.Info("сервер запущен")               // должно ругаться: invalid characters
-	slog.Debug("ошибка подключения")          // должно ругаться
-	logger.Warn("предупреждение")             // должно ругаться
-	zapLogger.Info("всё хорошо")              // должно ругаться
-	slog.Info("starting сервер")              // должно ругаться (смесь)
-	slog.Info("task completed ✅")             // должно ругаться (эмодзи)
-	zapLogger.Debug("response time: 100ms 🚀") // должно ругаться
+	slog.Info("сервер запущен")      // want "lowercase Latin letter" "invalid characters"
+	slog.Debug("ошибка подключения") // want "lowercase Latin letter" "invalid characters"
+	logger.Warn("предупреждение")    // want "lowercase Latin letter" "invalid characters"
+	zapLogger.Info("всё хорошо")     // want "lowercase Latin letter" "invalid characters"
+	// А здесь первая буква правильная, поэтому линтер доходит до проверки символов
+	slog.Info("starting сервер")              // want "invalid characters"
+	slog.Info("task completed ✅")             // want "invalid characters"
+	zapLogger.Debug("response time: 100ms 🚀") // want "invalid characters"
 
 	// ----- НЕПРАВИЛЬНЫЕ: спецсимволы, не входящие в extraAllowed -----
-	slog.Info("server started!")        // '!' не разрешён
-	slog.Error("connection failed!!")   // '!' не разрешён
-	slog.Info("are you sure?")          // '?' не разрешён
-	logger.Info("user input: <script>") // '<' и '>' не разрешены
+	slog.Info("server started!")        // want "invalid characters"
+	slog.Error("connection failed!!")   // want "invalid characters"
+	slog.Info("are you sure?")          // want "invalid characters"
+	logger.Info("user input: <script>") // want "invalid characters"
 
 	// ----- НЕПРАВИЛЬНЫЕ: чувствительные данные -----
 	// Прямые литералы с паттерном
-	slog.Info("user password: 123")         // должно ругаться
-	slog.Debug("api_key=abcd")              // должно ругаться
-	logger.Info("token: xyz")               // должно ругаться
-	zapLogger.Info("Authorization: Bearer") // должно ругаться (auth)
-	slog.Info("password = secret")          // должно ругаться
-	slog.Info("key : value")                // должно ругаться (key с двоеточием)
-	slog.Info("secret: data")               // должно ругаться
-	slog.Info("auth = basic")               // должно ругаться
+	slog.Info("user password: 123")         // want "sensitive"
+	slog.Debug("api_key=abcd")              // want "sensitive"
+	logger.Info("token: xyz")               // want "sensitive"
+	zapLogger.Info("authorization: Bearer") // с маленькой буквы, чтобы пройти первую проверку -> want "sensitive"
+	slog.Info("password = secret")          // want "sensitive"
+	slog.Info("key : value")                // want "sensitive"
+	slog.Info("secret: data")               // want "sensitive"
+	slog.Info("auth = basic")               // want "sensitive"
 
 	// Конкатенация строк
-	slog.Info("user password: " + "secret") // должно ругаться
-	slog.Debug("api_key=" + "12345")        // должно ругаться
-	logger.Info("token: " + token)          // должно ругаться
-	slog.Info("password = " + pwd)          // должно ругаться
-	slog.Info("secret: " + "sec")           // должно ругаться
-	slog.Info("auth = " + auth)             // должно ругаться
+	slog.Info("user password: " + "secret") // want "sensitive"
+	slog.Debug("api_key=" + "12345")        // want "sensitive"
+	logger.Info("token: " + token)          // want "sensitive"
+	slog.Info("password = " + pwd)          // want "sensitive"
+	slog.Info("secret: " + "sec")           // want "sensitive"
+	slog.Info("auth = " + auth)             // want "sensitive"
 
 	// Чувствительные данные внутри константы
-	slog.Info(sensitiveConst + "123") // (sensitiveConst содержит "password: ")
+	slog.Info(sensitiveConst + "123") // want "sensitive"
 
 	// Смешанные случаи (fmt.Sprintf и другие выражения)
-	slog.Info(fmt.Sprintf("token: %s", token)) // (литерал "token: " внутри Sprintf)
-	slog.Info("prefix: " + "token=" + value)   //(литерал "token=")
+	slog.Info(fmt.Sprintf("token: %s", token)) // want "sensitive"
+	slog.Info("prefix: " + "token=" + value)   // want "sensitive"
 }
