@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"linter/analazer"
+	"linter/analyzer"
 
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
 func main() {
 	fmt.Println("Запуск линтера...")
-	singlechecker.Main(analazer.Analyzer)
+	singlechecker.Main(analyzer.Analyzer)
 }

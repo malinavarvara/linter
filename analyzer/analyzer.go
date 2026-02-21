@@ -1,4 +1,4 @@
-package analazer
+package analyzer
 
 import "golang.org/x/tools/go/analysis"
 
