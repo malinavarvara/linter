@@ -1,13 +1,17 @@
-version: "2"
-
-run:
-  timeout: 5m
+linters-settings:
+  custom:
+    loglinter:
+      path: ./custom_linter.so
+      description: "Линтер для проверки логов"
+      original-url: github.com/malinavarvara/linter
 
 linters:
+  disable-all: true
   enable:
-    - linter
-  settings:
-    custom:
-      linter:
-        path: ./bin/linter.exe
-        description: "Линтер для проверки логов"
+    - loglinter
+
+issues:
+  # Отключаем лимиты, чтобы увидеть все найденные ошибки в тестовом файле
+  max-same-issues: 0
+  max-issues-per-linter: 0
+  exclude-use-default: false
